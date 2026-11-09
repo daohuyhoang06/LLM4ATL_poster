@@ -29,20 +29,17 @@
       <!-- 1 INTRODUCTION -->
       <section class="panel introduction" aria-labelledby="introduction-heading">
         <h2 class="panel-heading" id="introduction-heading"><span class="number">1</span><span
-            class="ribbon">Introduction &amp; Motivating</span></h2>
+            class="ribbon">Introduction &amp; Motivation</span></h2>
         <div class="introduction-layout">
           <div class="intro-left">
             <div class="intro-copy justified">
-              <p>ATL is an important model-to-model transformation language in Model-Driven Development, but writing ATL
-                transformations is difficult because it requires understanding source and target metamodels, ATL
-                constructs, OCL expressions, and intended mapping semantics. LLMs can help generate ATL transformations
-                from metamodels and natural-language requirements, but they may hallucinate metamodel references,
-                produce
-                type inconsistencies, or generate transformations that parse and execute yet still violate constraints
-                or
-                intended requirements.</p>
-              <p>This work proposes a neuro-symbolic approach that combines LLM-based generation with three successive
-                verification layers and iterative repair. We empirically evaluate the approach on 15 ATL tasks.</p>
+              <p><strong>ATL in Model-Driven Development.</strong> The Atlas Transformation Language (ATL) automates model-to-model
+                transformations across domains and abstraction levels. Its rules match source elements and create
+                target elements through property bindings.</p>
+              <p><strong>Challenge.</strong> Writing ATL is challenging due to the complexity of metamodels, ATL/OCL
+                syntax, and mapping semantics. LLMs can generate transformations from metamodels and natural-language
+                requirements, but syntactically valid results may still violate metamodel constraints or intended
+                requirements.</p>
             </div>
             <div class="metamodels">
               <figure class="meta er">
@@ -53,9 +50,21 @@
                 <img src="figures/RELmetamodel.png" alt="Relational metamodel with schema, relations, and attributes">
               </figure>
             </div>
-            <div class="metamodels-caption">Fig. 1: ER and REL metamodels.</div>
+            <div class="metamodels-caption">Fig. 2: ER and REL metamodels.</div>
           </div>
           <div class="intro-right">
+            <figure class="atl-figure">
+              <img src="figures/ATL.png" alt="ATL transformation for the ER-to-REL example">
+              <figcaption class="atl-caption">Fig. 1: Overview of ATL transformation execution.</figcaption>
+            </figure>
+            <aside class="intro-contributions" aria-label="Our contributions">
+              <div class="intro-contributions-title">Our contributions</div>
+              <ul class="square-list">
+                <li>A neuro-symbolic approach combining LLM-based ATL generation with three verification layers.</li>
+                <li>An empirical evaluation of the method on ATL transformation tasks.</li>
+              </ul>
+            </aside>
+            <!--
             <div class="atl-code-box">
               <div class="atl-code-header">
                 <span class="code-title">Listing 1: ATL transformation for the ER-to-REL example</span>
@@ -81,6 +90,7 @@
  <span class="kw-dir">from</span> att : <span class="type">ER!ERAttribute</span>, rse : <span class="type">ER!RelshipEnd</span> (att.entity=rse.entity <span class="kw-op">and</span> att.isKey=<span class="bool">true</span>)
  <span class="kw-dir">to</span>   t : <span class="type">REL!RELAttribute</span> (name &lt;- att.name, isKey &lt;- att.isKey, relation &lt;- rse.relship)}</code></pre>
             </div>
+            -->
           </div>
         </div>
       </section>
@@ -98,7 +108,7 @@
             <ul class="square-list">
               <li><strong>(1) Generation:</strong> The LLM uses these inputs to generate a structured ATL candidate.
               </li>
-              <li><strong>(2)–(4) Verification:</strong> Each generated candidate is progressively checked by the
+              <li><strong>(L1–L3) Verification:</strong> Each generated candidate is progressively checked by the
                 three
                 verification layers and then revised based on the returned diagnostics or counterexamples until all
                 checks
@@ -109,7 +119,7 @@
           </div>
           <figure class="pipeline-figure">
             <img src="figures/pipeline.png" alt="Neuro-symbolic generation, verification, and feedback pipeline">
-            <figcaption class="pipeline-caption">Fig. 2: Overview of the proposed neuro-symbolic approach.</figcaption>
+            <figcaption class="pipeline-caption">Fig. 3: Overview of the proposed neuro-symbolic approach.</figcaption>
           </figure>
         </div>
       </section>
@@ -120,15 +130,13 @@
           <h2 class="panel-heading" id="generation-heading"><span class="number">3</span><span
               class="ribbon">Generation</span></h2>
           <div class="generation-layout justified">
-            <p>The generation stage uses an LLM guided by metamodel information and the ATL abstract syntax. The ATL
-              transformation is structurally represented by an ATL JSON schema derived directly from the ATL abstract
-              syntax metamodel. The supported generation focuses on modules, model declarations, rules, in-patterns,
-              out-patterns, bindings, and helper expressions. The same schema is later reused for structural validation
-              in the first verification layer.</p>
+            <p>The LLM uses natural-language requirements, source and target metamodels, and ATL syntax specifications
+              to infer mappings and generate a structured ATL candidate. An ATL JSON schema guides generation and is
+              reused for structural checking.</p>
             <figure class="generation-figure">
-              <img src="figures/atl_ast_metamodel.png" alt="Detailed ATL abstract syntax metamodel">
-              <figcaption class="generation-caption">Fig. 3: The simplified metamodel of the ATL abstract syntax.
-              </figcaption>
+              <img src="figures/generated.png"
+                alt="LLM-based generation of a structured ATL AST candidate and its corresponding ATL rule">
+              <figcaption class="generation-caption">Fig. 4: Structured ATL candidate generation.</figcaption>
             </figure>
           </div>
         </section>
@@ -139,31 +147,33 @@
             <div class="layer-grid">
               <div class="layer">
                 <div class="layer-header"><span>L1</span><strong>Structural checking</strong></div>
-                <p>Checks whether the JSON representation of each ATL candidate conforms to the ATL JSON schema derived
+                <p>Checks whether the JSON representation of each ATL candidate conforms to the JSON schema derived
                   from the ATL abstract syntax.</p>
               </div>
               <div class="layer">
                 <div class="layer-header"><span>L2</span><strong>Static analysis</strong></div>
-                <p>Checks whether referenced model types and features are defined in the corresponding source &amp;
-                  target
-                  metamodels,
-                  and whether expressions are type consistent.</p>
+                <p>Checks whether referenced types and features are defined in the source and target metamodels and whether expressions are type con&shy;sistent.</p>
               </div>
               <div class="layer">
                 <div class="layer-header"><span>L3</span><strong>Formal verification</strong></div>
-                <p>Checks whether valid source models are transformed into target models satisfying the specified target
+                <p>Checks whether valid source models are transformed into target models satisfying target
                   metamodel
-                  constraints; violations yield counterexamples.</p>
+                  constraints; violations yield counter&shy;examples.</p>
               </div>
             </div>
-            <figure class="formal-figure">
-              <img src="figures/formal_verification.png"
-                alt="Formal verification using transformation models and bounded model finding">
-              <figcaption class="formal-caption">Fig. 4: Overview of the formal verification layer.</figcaption>
-            </figure>
-            <p class="verification-note">Verification uses bounded model finding. A <b>SAT</b>
-              result identifies a counterexample; an <b>UNSAT</b> result means none exists within the configured bounds.
-            </p>
+              <div class="formal-row">
+                <div class="formal-visual">
+                  <figure class="formal-figure">
+                    <img src="figures/formal_verification.png"
+                      alt="Formal verification using transformation models and bounded model finding">
+                    <figcaption class="formal-caption">Fig. 5: Overview of the formal verification layer.</figcaption>
+                  </figure>
+                </div>
+                <div class="verification-note">
+                  <p>Formal verification uses bounded model finding. A <b>SAT</b> result identifies a counterexample; an
+                    <b>UNSAT</b> result means none exists within the configured bounds.</p>
+                </div>
+              </div>
           </div>
         </section>
       </div>
@@ -174,8 +184,6 @@
           <h2 class="panel-heading" id="evaluation-heading"><span class="number">5</span><span
               class="ribbon">Experimental Evaluation</span></h2>
           <div class="evaluation-layout">
-            <!-- Cột trái: Setup/Metrics (trên) & Bảng 1 Ablation (dưới) -->
-            <div class="eval-col">
               <div class="eval-summary">
                 <div class="eval-setup">
                   <h3 class="eval-title">
@@ -186,28 +194,25 @@
                     Setup
                   </h3>
                   <ul class="square-list">
-                    <li>15 ATL tasks (LLM4MTLs), 45 test cases</li>
-                    <li>Gemini 3.6 Flash (&le; 5 revisions)</li>
+                    <li><strong>Benchmark:</strong> 15 ATL tasks (LLM4MTLs), 45 test cases</li>
+                    <li><strong>LLM Setup:</strong> Gemini 3.6 Flash (&le; 5 revisions)</li>
                     <li><strong>Bounds:</strong> 5 objects/class, 10 links/ref</li>
                   </ul>
                 </div>
                 <div class="eval-metrics">
-                  <div class="eval-title">
-                    <i class="fa-solid fa-chart-simple mini-icon"></i> Metrics
+                  <div class="metrics-heading">
+                    <h3 class="eval-title"><i class="fa-solid fa-chart-simple mini-icon"></i> Metrics</h3>
                   </div>
-                  <div class="metric-tags">
-                    <span>Parsed</span>
-                    <span>PPLs</span>
-                    <span>Tests Passed</span>
-                    <div class="tag-pair">
-                      <span>Avg. Tokens</span>
-                      <span>Avg. Time</span>
-                    </div>
+                  <div class="metric-lines">
+                    <p><b>Parsed:</b> accepted by ATL parser <i>•</i> <b>PPLs:</b> parser problems per code line</p>
+                    <p><b>Tests Passed:</b> transformations passing all functional tests</p>
+                    <p><b>Avg. Tokens:</b> tokens per task <i>•</i> <b>Avg. Time:</b> end-to-end time per task</p>
                   </div>
                 </div>
-              </div>
+                </div>
 
-              <div class="data-table">
+                <div class="tables-row">
+                  <div class="data-table">
                 <h3>Table 1: Ablation study of verification layers</h3>
                 <table aria-label="Ablation study of verification layers">
                   <thead>
@@ -215,8 +220,8 @@
                       <th>Configuration</th>
                       <th>Parsed</th>
                       <th>PPLs</th>
-                      <th>Tests<br>Passed</th>
-                      <th>Avg. Time<br>(s)</th>
+                        <th>Tests Passed</th>
+                        <th>Avg. Time (s)</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -251,20 +256,10 @@
                   </tbody>
                 </table>
               </div>
-            </div>
-
-            <!-- Cột phải: Takeaway (trên) & Bảng 2 Prompting (dưới) -->
-            <div class="eval-col">
               <div class="takeaway-card">
-                <!-- <div class="takeaway-badge">
-                  <svg viewBox="0 0 448 512">
-                    <path fill="currentColor"
-                      d="M438.6 105.4c12.5 12.5 12.5 32.8 0 45.3l-256 256c-12.5 12.5-32.8 12.5-45.3 0l-128-128c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L160 338.7 393.4 105.4c12.5-12.5 32.8-12.5 45.3 0z" />
-                  </svg>
-                </div> -->
+                <div class="takeaway-badge" aria-hidden="true">✓</div>
                 <div class="takeaway-text">
-                  <b>Takeaway:</b> The proposed method produces parsable transformations for all 15 tasks, with 93%
-                  (14/15) passing the functional tests, at the cost of higher token consumption and processing time.
+                  <b>Takeaway:</b> The proposed method achieves the best parsing and functional correctness, though at higher token and time costs.
                 </div>
               </div>
 
@@ -276,9 +271,9 @@
                       <th>Method</th>
                       <th>Parsed</th>
                       <th>PPLs</th>
-                      <th>Tests<br>Passed</th>
-                      <th>Avg. Tokens<br>(k)</th>
-                      <th>Avg. Time<br>(s)</th>
+                        <th>Tests Passed</th>
+                        <th>Avg. Tokens (k)</th>
+                        <th>Avg. Time (s)</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -332,19 +327,12 @@
           <h2 class="panel-heading" id="conclusion-heading"><span class="number">6</span><span class="ribbon">Conclusion
               &amp; Future Work</span></h2>
           <div class="conclusion-layout justified">
-            <p>The proposed approach integrates LLM-based generation with structural checking, static analysis, and
-              formal
-              verification; the detected violations guide revision. The method improves the functional correctness of
-              the
-              generated ATL transformations on the evaluated tasks.</p>
+           <p>The proposed approach integrates LLM-based generation with structural checking, static analysis, and formal verification, with detected violations guiding revision. It can improve the functional correctness of generated ATL transformations on the evaluated tasks.</p>
             <h3>Future work:</h3>
             <ul class="square-list">
-              <li>Extend the formal verification layer to support a broader range of ATL/OCL constructs and other
-                transformation
-                languages.
-              </li>
-              <li>Improve the revision process using diagnostics and counterexamples.</li>
-              <li>Evaluate on more additional LLMs and larger, more diverse benchmarks.</li>
+              <li>Extend formal verification to a broader ATL/OCL subset and other transformation languages.</li>
+              <li>Improve revision using diagnostics and counterexamples.</li>
+              <li>Evaluate additional LLMs and larger benchmarks.</li>
             </ul>
           </div>
         </section>
