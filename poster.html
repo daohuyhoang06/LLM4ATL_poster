@@ -60,7 +60,7 @@
             <aside class="intro-contributions" aria-label="Our contributions">
               <div class="intro-contributions-title">Our contributions</div>
               <ul class="square-list">
-                <li>A neuro-symbolic approach combining LLM-based ATL generation with three verification layers.</li>
+                <li>A neuro-symbolic approach combining LLM-based ATL generation with three verification layers: structural checking, static analysis, and formal verification.</li>
                 <li>An empirical evaluation of the method on ATL transformation tasks.</li>
               </ul>
             </aside>
@@ -114,8 +114,8 @@
                 checks
                 pass or the
                 retry limit is reached.</li>
-              <li>Only those candidates that successfully pass all verification layers are accepted.</li>
             </ul>
+            <p>Only those candidates that successfully pass all verification layers are accepted.</p>
           </div>
           <figure class="pipeline-figure">
             <img src="figures/pipeline.png" alt="Neuro-symbolic generation, verification, and feedback pipeline">
@@ -128,7 +128,7 @@
       <div class="middle-grid">
         <section class="panel generation" aria-labelledby="generation-heading">
           <h2 class="panel-heading" id="generation-heading"><span class="number">3</span><span
-              class="ribbon">Generation</span></h2>
+              class="ribbon">Generation of Transformations</span></h2>
           <div class="generation-layout justified">
             <p>The LLM uses natural-language requirements, source and target metamodels, and ATL syntax specifications
               to infer mappings and generate a structured ATL candidate. An ATL JSON schema guides generation and is
@@ -142,23 +142,21 @@
         </section>
         <section class="panel verification" aria-labelledby="verification-heading">
           <h2 class="panel-heading" id="verification-heading"><span class="number">4</span><span
-              class="ribbon">Verification</span></h2>
+              class="ribbon">Verification of ATL Transformations</span></h2>
           <div class="verification-layout">
             <div class="layer-grid">
               <div class="layer">
                 <div class="layer-header"><span>L1</span><strong>Structural checking</strong></div>
-                <p>Checks whether the JSON representation of each ATL candidate conforms to the JSON schema derived
-                  from the ATL abstract syntax.</p>
+                <p>Checks whether the generated ATL AST conforms to the JSON schema derived from ATL abstract syntax.</p>
               </div>
               <div class="layer">
                 <div class="layer-header"><span>L2</span><strong>Static analysis</strong></div>
-                <p>Checks whether referenced types and features are defined in the source and target metamodels and whether expressions are type con&shy;sistent.</p>
+                <p>Checks whether referenced types and features exist in source and target metamodels and expressions are type-consistent.</p>
               </div>
               <div class="layer">
                 <div class="layer-header"><span>L3</span><strong>Formal verification</strong></div>
                 <p>Checks whether valid source models are transformed into target models satisfying target
-                  metamodel
-                  constraints; violations yield counter&shy;examples.</p>
+                  metamodel constraints.</p>
               </div>
             </div>
               <div class="formal-row">
@@ -170,8 +168,15 @@
                   </figure>
                 </div>
                 <div class="verification-note">
-                  <p>Formal verification uses bounded model finding. A <b>SAT</b> result identifies a counterexample; an
-                    <b>UNSAT</b> result means none exists within the configured bounds.</p>
+                  <p>
+                    Formal verification uses bounded model finding to search for
+                    counterexamples where valid source models yield target models
+                    violating specified constraints.
+                  </p>
+                  <ul class="square-list">
+                    <li><b>SAT:</b> A counterexample is found.</li>
+                    <li><b>UNSAT:</b> No counterexample exists within the configured bounds.</li>
+                  </ul>
                 </div>
               </div>
           </div>
@@ -196,7 +201,7 @@
                   <ul class="square-list">
                     <li><strong>Benchmark:</strong> 15 ATL tasks (LLM4MTLs), 45 test cases</li>
                     <li><strong>LLM Setup:</strong> Gemini 3.6 Flash (&le; 5 revisions)</li>
-                    <li><strong>Bounds:</strong> 5 objects/class, 10 links/ref</li>
+                    <li><strong>Verification Bounds:</strong>&le; 5 objects/class</li>
                   </ul>
                 </div>
                 <div class="eval-metrics">
@@ -204,9 +209,11 @@
                     <h3 class="eval-title"><i class="fa-solid fa-chart-simple mini-icon"></i> Metrics</h3>
                   </div>
                   <div class="metric-lines">
-                    <p><b>Parsed:</b> accepted by ATL parser <i>•</i> <b>PPLs:</b> parser problems per code line</p>
-                    <p><b>Tests Passed:</b> transformations passing all functional tests</p>
-                    <p><b>Avg. Tokens:</b> tokens per task <i>•</i> <b>Avg. Time:</b> end-to-end time per task</p>
+                    <p><b>Parsed:</b> accepted by ATL parser</p>
+                    <p><b>Avg. Tokens:</b> tokens per task</p>
+                    <p><b>PPLs:</b> parser problems per code line</p>
+                    <p><b>Avg. Time:</b> end-to-end time per task</p>
+                    <p class="metric-tests"><b>Tests Passed:</b> passing all functional tests</p>
                   </div>
                 </div>
                 </div>
@@ -327,7 +334,7 @@
           <h2 class="panel-heading" id="conclusion-heading"><span class="number">6</span><span class="ribbon">Conclusion
               &amp; Future Work</span></h2>
           <div class="conclusion-layout justified">
-           <p>The proposed approach integrates LLM-based generation with structural checking, static analysis, and formal verification, with detected violations guiding revision. It can improve the functional correctness of generated ATL transformations on the evaluated tasks.</p>
+           <p>The proposed approach combines LLM-based generation of ATL transformations with structural checking, static analysis, and formal verification, with detected violations guiding revision. This approach can improve the functional correctness of generated transformations on the evaluated tasks.</p>
             <h3>Future work:</h3>
             <ul class="square-list">
               <li>Extend formal verification to a broader ATL/OCL subset and other transformation languages.</li>
